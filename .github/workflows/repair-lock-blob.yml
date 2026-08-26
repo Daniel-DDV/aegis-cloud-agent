@@ -1,0 +1,45 @@
+name: Repair lock blob
+on:
+  workflow_dispatch:
+  push:
+    branches: [cursor/aegis-cloud-agent-2782]
+    paths:
+      - 'apps/dashboard/package-lock.json.gz.b64.part*'
+      - '.github/workflows/repair-lock-blob.yml'
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: cursor/aegis-cloud-agent-2782
+      - name: Reassemble lock blob from parts
+        run: |
+          set -euo pipefail
+          PARTS=(apps/dashboard/package-lock.json.gz.b64.part*)
+          cat "${PARTS[@]}" > apps/dashboard/package-lock.json.gz.b64
+          echo "reassembled $(wc -c < apps/dashboard/package-lock.json.gz.b64) bytes"
+          md5sum apps/dashboard/package-lock.json.gz.b64
+          # Must contain IdM8 marker at expected offset
+          python3 - <<'PY'
+          from pathlib import Path
+          b = Path('apps/dashboard/package-lock.json.gz.b64').read_text()
+          assert len(b) == 21646, len(b)
+          assert b.find('IdM8') == 833
+          assert b.endswith('9FkqFgEA\n')
+          print('lock blob checks ok')
+          PY
+      - name: Commit if changed
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/dashboard/package-lock.json.gz.b64
+          if git diff --cached --quiet; then
+            echo "no change"
+            exit 0
+          fi
+          git commit -m "fix: self-bootstrap install via public clone + repair lock blob"
+          git push origin HEAD:cursor/aegis-cloud-agent-2782
