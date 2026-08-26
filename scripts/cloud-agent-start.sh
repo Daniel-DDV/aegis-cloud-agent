@@ -4,14 +4,26 @@ set -euo pipefail
 
 export PATH="${HOME}/.local/bin:${PATH}"
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-if [[ -f "/workspace/scripts/cloud-agent-start.sh" ]]; then
+if [[ -f /tmp/aegis-root ]]; then
+  ROOT="$(cat /tmp/aegis-root)"
+elif [[ -f "/workspace/apps/api/main.py" ]]; then
   ROOT="/workspace"
-elif [[ -f "/agent/scripts/cloud-agent-start.sh" ]]; then
+elif [[ -f "/agent/apps/api/main.py" ]]; then
   ROOT="/agent"
-elif [[ -f "./scripts/cloud-agent-start.sh" ]]; then
+elif [[ -f "./apps/api/main.py" ]]; then
   ROOT="$(pwd)"
+elif [[ -f "/workspace/aegis-cloud-agent/apps/api/main.py" ]]; then
+  ROOT="/workspace/aegis-cloud-agent"
+else
+  # Ensure sources exist via install path.
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  if [[ -f "${SCRIPT_DIR}/cloud-agent-install.sh" ]]; then
+    bash "${SCRIPT_DIR}/cloud-agent-install.sh"
+    ROOT="$(cat /tmp/aegis-root)"
+  else
+    echo "[aegis] cannot locate source tree" >&2
+    exit 1
+  fi
 fi
 
 export PYTHONPATH="${ROOT}/packages:${ROOT}/apps/api:${PYTHONPATH:-}"

@@ -4,20 +4,36 @@ set -euo pipefail
 
 export PATH="${HOME}/.local/bin:${PATH}"
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+resolve_root() {
+  if [[ -f "/workspace/apps/api/main.py" ]]; then
+    echo "/workspace"
+  elif [[ -f "/agent/apps/api/main.py" ]]; then
+    echo "/agent"
+  elif [[ -f "./apps/api/main.py" ]]; then
+    pwd
+  else
+    echo ""
+  fi
+}
 
-# Prefer checked-out workspace layout when present.
-if [[ -f "/workspace/scripts/cloud-agent-install.sh" ]]; then
-  ROOT="/workspace"
-elif [[ -f "/agent/scripts/cloud-agent-install.sh" ]]; then
-  ROOT="/agent"
-elif [[ -f "./scripts/cloud-agent-install.sh" ]]; then
-  ROOT="$(pwd)"
+ROOT="$(resolve_root)"
+
+if [[ -z "$ROOT" ]]; then
+  echo "[aegis] source tree missing — cloning public repo"
+  CLONE_DIR="${AEGIS_CLONE_DIR:-/workspace/aegis-cloud-agent}"
+  mkdir -p "$(dirname "$CLONE_DIR")"
+  if [[ ! -d "$CLONE_DIR/.git" ]]; then
+    git clone --depth 1 --branch cursor/aegis-cloud-agent-2782 \
+      https://github.com/Daniel-DDV/aegis-cloud-agent.git "$CLONE_DIR"
+  else
+    git -C "$CLONE_DIR" fetch --depth 1 origin cursor/aegis-cloud-agent-2782 || true
+    git -C "$CLONE_DIR" checkout cursor/aegis-cloud-agent-2782 || true
+    git -C "$CLONE_DIR" pull --ff-only origin cursor/aegis-cloud-agent-2782 || true
+  fi
+  ROOT="$CLONE_DIR"
 fi
 
 cd "$ROOT"
-
 echo "[aegis] install starting from $ROOT"
 
 python3 -m pip install --upgrade pip
@@ -32,12 +48,16 @@ if [[ ! -f "$ROOT/apps/dashboard/package-lock.json" && -f "$ROOT/apps/dashboard/
 fi
 
 if [[ -f "$ROOT/apps/dashboard/package-lock.json" ]]; then
-  (cd "$ROOT/apps/dashboard" && npm ci)
+  if ! (cd "$ROOT/apps/dashboard" && npm ci); then
+    echo "[aegis] npm ci failed; falling back to npm install"
+    (cd "$ROOT/apps/dashboard" && npm install)
+  fi
 else
   (cd "$ROOT/apps/dashboard" && npm install)
 fi
 
 mkdir -p "$ROOT/reports"
+echo "$ROOT" > /tmp/aegis-root
 # Corpus is already vendored under corpus/eu-ai-act — nothing to download for offline demos.
 
 echo "[aegis] install complete"
