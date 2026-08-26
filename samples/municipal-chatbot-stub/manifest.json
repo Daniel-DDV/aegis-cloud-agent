@@ -1,0 +1,7 @@
+{
+  "name": "municipal-chatbot-stub",
+  "description": "Mai-inspired Dutch municipal citizen-service chatbot with intentional gaps",
+  "is_chatbot": true,
+  "annex_iii_domains": ["essential_services"],
+  "language": "nl"
+}

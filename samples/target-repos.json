@@ -1,0 +1,13 @@
+[
+  {
+    "id": "municipal-chatbot-stub",
+    "path": "samples/municipal-chatbot-stub",
+    "label": "Municipal citizen chatbot (Mai-inspired stub)"
+  },
+  {
+    "id": "aegis-self",
+    "path": ".",
+    "label": "Aegis self-audit",
+    "self_audit": true
+  }
+]
