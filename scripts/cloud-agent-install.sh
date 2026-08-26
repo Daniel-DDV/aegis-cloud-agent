@@ -41,13 +41,11 @@ python3 -m pip install -e "$ROOT/packages/rubric"
 python3 -m pip install -r "$ROOT/apps/api/requirements.txt"
 python3 -m pip install -e "$ROOT/apps/api"
 
-# Reassemble vendored lock blob from parts if needed.
+# Reassemble vendored lock blob from parts when present (authoritative).
 PARTS_GLOB="$ROOT/apps/dashboard/package-lock.json.gz.b64.part"*
-if [[ ! -f "$ROOT/apps/dashboard/package-lock.json.gz.b64" ]] || [[ $(wc -c < "$ROOT/apps/dashboard/package-lock.json.gz.b64") -lt 10000 ]]; then
-  if compgen -G "$PARTS_GLOB" > /dev/null; then
-    cat $PARTS_GLOB > "$ROOT/apps/dashboard/package-lock.json.gz.b64"
-    echo "[aegis] reassembled package-lock.json.gz.b64 from parts ($(wc -c < "$ROOT/apps/dashboard/package-lock.json.gz.b64") bytes)"
-  fi
+if compgen -G "$PARTS_GLOB" > /dev/null; then
+  cat $PARTS_GLOB > "$ROOT/apps/dashboard/package-lock.json.gz.b64"
+  echo "[aegis] reassembled package-lock.json.gz.b64 from parts ($(wc -c < "$ROOT/apps/dashboard/package-lock.json.gz.b64") bytes)"
 fi
 
 # Materialize package-lock.json from compressed vendor blob when absent.
