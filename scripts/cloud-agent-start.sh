@@ -2,8 +2,18 @@
 # Per-boot start for Aegis API + dashboard (idempotent readiness, then return).
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export PATH="${HOME}/.local/bin:${PATH}"
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+if [[ -f "/workspace/scripts/cloud-agent-start.sh" ]]; then
+  ROOT="/workspace"
+elif [[ -f "/agent/scripts/cloud-agent-start.sh" ]]; then
+  ROOT="/agent"
+elif [[ -f "./scripts/cloud-agent-start.sh" ]]; then
+  ROOT="$(pwd)"
+fi
+
 export PYTHONPATH="${ROOT}/packages:${ROOT}/apps/api:${PYTHONPATH:-}"
 mkdir -p "${ROOT}/reports" /tmp/aegis-logs
 
@@ -33,7 +43,7 @@ for i in $(seq 1 60); do
   curl -sf "http://127.0.0.1:8000/health" >/dev/null 2>&1 && api_ok=1
   curl -sf "http://127.0.0.1:3000" >/dev/null 2>&1 && dash_ok=1
   if [[ "$api_ok" == "1" && "$dash_ok" == "1" ]]; then
-    echo "[aegis] API and dashboard ready"
+    echo "[aegis] API and dashboard ready (root=${ROOT})"
     exit 0
   fi
   sleep 1

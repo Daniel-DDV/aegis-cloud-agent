@@ -4,7 +4,18 @@ set -euo pipefail
 
 export PATH="${HOME}/.local/bin:${PATH}"
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# Prefer checked-out workspace layout when present.
+if [[ -f "/workspace/scripts/cloud-agent-install.sh" ]]; then
+  ROOT="/workspace"
+elif [[ -f "/agent/scripts/cloud-agent-install.sh" ]]; then
+  ROOT="/agent"
+elif [[ -f "./scripts/cloud-agent-install.sh" ]]; then
+  ROOT="$(pwd)"
+fi
+
 cd "$ROOT"
 
 echo "[aegis] install starting from $ROOT"
