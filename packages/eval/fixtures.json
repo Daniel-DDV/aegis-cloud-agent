@@ -1,0 +1,87 @@
+[
+  {
+    "id": "prohibited-social-scoring",
+    "corpus": "A public authority social scoring system assigns each citizen score based on behaviour.",
+    "metadata": {},
+    "expected_risk_tier": "prohibited",
+    "must_include_articles": ["art5"]
+  },
+  {
+    "id": "high-employment-cv",
+    "corpus": "Automated cv screening ranks job applicants for hiring score in recruitment.",
+    "metadata": {},
+    "expected_risk_tier": "high",
+    "must_include_articles": ["art6"]
+  },
+  {
+    "id": "high-essential-services-chatbot",
+    "corpus": "Municipal chatbot helps citizens apply for social benefits via the citizen portal.",
+    "metadata": {"is_chatbot": true, "annex_iii_domains": ["essential_services"]},
+    "expected_risk_tier": "high",
+    "must_include_articles": ["art6", "art50"]
+  },
+  {
+    "id": "limited-generic-chatbot",
+    "corpus": "A marketing conversational agent answers FAQs about opening hours.",
+    "metadata": {"is_chatbot": true},
+    "expected_risk_tier": "limited",
+    "must_include_articles": ["art50"]
+  },
+  {
+    "id": "minimal-static-site",
+    "corpus": "Static documentation website with no AI features.",
+    "metadata": {},
+    "expected_risk_tier": "minimal",
+    "must_include_articles": []
+  },
+  {
+    "id": "high-biometric",
+    "corpus": "Airport facial recognition biometric gate matches passengers to watchlists.",
+    "metadata": {},
+    "expected_risk_tier": "high",
+    "must_include_articles": ["art6"]
+  },
+  {
+    "id": "high-education",
+    "corpus": "University uses AI for student assessment and exam scoring.",
+    "metadata": {},
+    "expected_risk_tier": "high",
+    "must_include_articles": ["art6"]
+  },
+  {
+    "id": "high-law-enforcement",
+    "corpus": "Predictive policing model estimates crime prediction hotspots for patrols.",
+    "metadata": {},
+    "expected_risk_tier": "high",
+    "must_include_articles": ["art6"]
+  },
+  {
+    "id": "doc-gaps-empty",
+    "corpus": "Prototype LLM app with no governance files.",
+    "files": ["app.py"],
+    "expected_doc_gaps_min": 4
+  },
+  {
+    "id": "doc-complete",
+    "corpus": "Includes model card, data sheet, human oversight, instructions for use, and risk register.",
+    "files": [
+      "model_card.md",
+      "datasheet.md",
+      "oversight.md",
+      "instructions.md",
+      "risk_register.md"
+    ],
+    "expected_doc_gaps_min": 0,
+    "expected_doc_gaps_max": 0
+  },
+  {
+    "id": "bias-risk",
+    "corpus": "Training data scraped from forums. Zip code scoring used. No demographic data collected. No bias audit.",
+    "expected_bias_findings_min": 2
+  },
+  {
+    "id": "red-team-secrets",
+    "corpus": "Config contains api_key = sk-live-example and shell=true subprocess.call with no rate limit.",
+    "expected_red_findings_min": 2
+  }
+]

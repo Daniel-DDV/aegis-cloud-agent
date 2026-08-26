@@ -1,0 +1,20 @@
+{
+  "name": "Aegis Governance Lab",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "install": "./scripts/cloud-agent-install.sh",
+  "start": "./scripts/cloud-agent-start.sh",
+  "terminals": [
+    {
+      "name": "aegis-api",
+      "command": "cd apps/api && PYTHONPATH=\"../../packages:$PYTHONPATH\" uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    },
+    {
+      "name": "aegis-dashboard",
+      "command": "cd apps/dashboard && npm run dev -- --port 3000 --hostname 0.0.0.0"
+    }
+  ],
+  "ports": [3000, 8000]
+}

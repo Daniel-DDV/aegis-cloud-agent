@@ -1,0 +1,16 @@
+{
+  "regulation": "EU 2024/1689",
+  "common_name": "EU AI Act",
+  "disclaimer": "Demonstration corpus only — not legal advice.",
+  "articles_indexed": ["art5", "art6", "art9", "art10", "art11", "art13", "art14", "art15", "art50"],
+  "annex_iii_domains": [
+    "biometrics",
+    "critical_infrastructure",
+    "education",
+    "employment",
+    "essential_services",
+    "law_enforcement",
+    "migration",
+    "justice"
+  ]
+}
